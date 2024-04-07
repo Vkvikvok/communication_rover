@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-from functools import partial
 import socket
 from example_interfaces.srv import SendGoal # Buraya bir tane service tipi girilecek
 
@@ -46,8 +45,7 @@ class Send_Goal_Client_Node(Node):
         sock_client.close()
 
     except socket.error as e:
-        # Bağlantı kurulamadı!
-        print(f'Bağlantı kurulamadı: {e}')
+        return -1
 
 
 def main(args=None):
@@ -63,7 +61,6 @@ if __name__ == "__main__":
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-from functools import partial
 import socket
 from example_interfaces.srv import SendGoal # Buraya bir tane service tipi girilecek
 
