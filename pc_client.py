@@ -59,3 +59,53 @@ def main(args=None):
 
 if __name__ == "__main__":
     main()
+########################################################################
+#!/usr/bin/env python3
+import rclpy
+from rclpy.node import Node
+from functools import partial
+import socket
+from example_interfaces.srv import SendGoal # Buraya bir tane service tipi girilecek
+
+#Bu dosya içerisinde terminatorden call fonksiyonuyla mesaj gönderebileceğimiz bir server oluşturulacak.
+#Ardından buradan alınan mesajı socket ile diğer bilgisayara göndereceğiz.
+
+class SendGoalServerNode(Node):
+    def __init__(self):
+        super().__init__("send_goal_server")
+        self.server_ = self.create_server(SendGoal, "send_goal", self.callback_send_goal)
+        self.get_logger().info("Send goal server has been started.")
+
+    def callback_send_goal(self, request, response):
+        #burası doldurulacak
+        self.get_logger().info("The location" + request.location + "sent as a goal")
+        return response    
+        
+    try:
+        #Socket örneği oluşturuldu(IPv4, UDP, sürekli bağlantıyı kontrol edecek şekilde ayarlandı)
+        sock_client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        #Socket sunucuya bağlanacak
+        sock_client.bind(("192.168.1.10", 22))
+
+        #Veri yolla
+        data = "".encode("utf-8")#encode edilmiş gps verisi
+        sock_client.send(data)
+
+        #Socket kapatıldı
+        sock_client.close()
+
+    except socket.error as e:
+        # Bağlantı kurulamadı!
+        print(f'Bağlantı kurulamadı: {e}')
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = SendGoalServerNode()
+    rclpy.spin(node)
+    rclpy.shutdown()
+
+
+if __name__ == "__main__":
+    main()
